@@ -10,6 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Any
 import random
+import os
 
 class MusicGeneratorService:
     """Service for generating music tracks based on text prompts"""
@@ -122,7 +123,7 @@ class MusicGeneratorService:
     
     async def _simulate_generation(self, track_id: str, estimated_time: int):
         """
-        Simulate the music generation process
+        Simulate the music generation process and create placeholder MP3 file
         
         Args:
             track_id: Unique identifier for the generation task
@@ -143,6 +144,9 @@ class MusicGeneratorService:
             task["progress"] = progress
             
             if step == steps:
+                # Create placeholder MP3 file
+                self._create_placeholder_mp3(track_id, task["duration"], task["prompt"])
+                
                 # Mark as completed
                 task["status"] = "completed"
                 task["download_url"] = f"/downloads/{track_id}.mp3"
@@ -150,6 +154,43 @@ class MusicGeneratorService:
             
             # Wait for a portion of the estimated time
             await asyncio.sleep(estimated_time / steps)
+    
+    def _create_placeholder_mp3(self, track_id: str, duration: int, prompt: str):
+        """
+        Create a placeholder MP3 file for the generated track
+        
+        Args:
+            track_id: Unique identifier for the track
+            duration: Duration of the track in seconds
+            prompt: Text prompt used for generation
+        """
+        # Ensure downloads directory exists
+        downloads_dir = "downloads"
+        os.makedirs(downloads_dir, exist_ok=True)
+        
+        # Create a simple placeholder MP3 file
+        file_path = os.path.join(downloads_dir, f"{track_id}.mp3")
+        
+        # Generate a basic MP3 header and some placeholder content
+        # This is a minimal MP3 file structure for testing purposes
+        mp3_header = bytes([
+            0xFF, 0xFB, 0x90, 0x00,  # Basic MP3 frame header
+            0x00, 0x00, 0x00, 0x00,  # Additional header data
+        ])
+        
+        # Create file with metadata comment
+        with open(file_path, "wb") as f:
+            # Write basic MP3 header
+            f.write(mp3_header)
+            
+            # Add some placeholder audio data (silence)
+            # In a real implementation, this would be generated audio
+            placeholder_data = b'\x00' * (duration * 1000)  # Rough estimate of file size
+            f.write(placeholder_data)
+            
+            # Add ID3 tag with metadata (simplified)
+            id3_tag = f"Generated track: {prompt[:50]}...".encode('utf-8').ljust(128, b'\x00')
+            f.write(id3_tag)
     
     def get_supported_genres(self) -> list:
         """

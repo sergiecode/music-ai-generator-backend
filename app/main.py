@@ -5,9 +5,11 @@ This is the core service of the Music AI Generator system.
 Created by Sergie Code for musicians and content creators.
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from app.routers import music
+import os
 
 # Create FastAPI application instance
 app = FastAPI(
@@ -44,6 +46,32 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "music-ai-generator-backend"}
+
+@app.get("/downloads/{filename}")
+async def download_file(filename: str):
+    """
+    Download endpoint for generated music files
+    
+    Args:
+        filename: Name of the file to download
+        
+    Returns:
+        FileResponse with the requested audio file
+        
+    Raises:
+        HTTPException: If file not found (404)
+    """
+    file_path = os.path.join("downloads", filename)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found - it may have expired")
+    
+    return FileResponse(
+        path=file_path,
+        media_type="audio/mpeg",
+        filename=filename,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
 
 if __name__ == "__main__":
     import uvicorn
