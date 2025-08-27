@@ -200,6 +200,39 @@ The current `MusicGeneratorService` class is designed with hooks for:
 - Model switching and comparison
 - Custom fine-tuning integration
 
+## 🧪 Testing
+
+This project includes a comprehensive test suite with 93% code coverage.
+
+### Running Tests
+
+```powershell
+# Run all tests
+python run_tests.py all
+
+# Run specific test categories
+python run_tests.py unit         # Unit tests only
+python run_tests.py integration  # Integration tests only
+python run_tests.py coverage     # With coverage analysis
+python run_tests.py quick        # Smoke tests (fastest)
+python run_tests.py performance  # Performance tests only
+python run_tests.py security     # Security tests only
+
+# Using batch file (Windows)
+run_tests.bat all
+```
+
+### Test Coverage
+
+- **56 Total Tests** across 3 categories
+- **93% Code Coverage** with detailed reporting
+- **Unit Tests**: API endpoints and service logic
+- **Integration Tests**: End-to-end workflows
+- **Performance Tests**: Response times and concurrency
+- **Security Tests**: Input validation and XSS prevention
+
+See `TEST_SUMMARY.md` for detailed test documentation.
+
 ## 🛠️ Development
 
 ### Project Structure Details
@@ -212,26 +245,38 @@ music-ai-generator-backend/
 │   │   └── music.py         # Music generation endpoints
 │   └── services/            # Business logic layer
 │       └── generator.py     # Core generation service
+├── tests/                   # Comprehensive test suite
+│   ├── conftest.py         # Test configuration
+│   ├── test_api.py         # API endpoint tests
+│   ├── test_services.py    # Service layer tests
+│   └── test_integration.py # Integration tests
 ├── requirements.txt         # Python dependencies
-├── README.md               # Project documentation
-└── .gitignore             # Git ignore patterns
+├── pytest.ini             # Test configuration
+├── run_tests.py           # Test runner script
+└── README.md              # Project documentation
 ```
 
 ### Adding New Features
 
 1. **New Endpoints**: Add to `app/routers/`
 2. **Business Logic**: Extend `app/services/`
-3. **Models**: Create `app/models/` for data structures
-4. **Utilities**: Add `app/utils/` for helper functions
+3. **Tests**: Add corresponding tests in `tests/`
+4. **Models**: Create `app/models/` for data structures
+5. **Utilities**: Add `app/utils/` for helper functions
 
 ### Running Tests
 
 ```powershell
-# Install test dependencies
-pip install pytest pytest-asyncio httpx
+# Install test dependencies (included in requirements.txt)
+pip install pytest pytest-asyncio httpx pytest-cov
 
-# Run tests
-pytest
+# Run tests with coverage
+python run_tests.py coverage
+
+# Run specific test files
+pytest tests/test_api.py -v
+pytest tests/test_services.py -v
+pytest tests/test_integration.py -v
 ```
 
 ## 🌟 About the Creator
